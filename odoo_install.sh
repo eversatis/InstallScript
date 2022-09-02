@@ -35,7 +35,7 @@ OE_SUPERADMIN="admin"
 GENERATE_RANDOM_PASSWORD="True"
 OE_CONFIG="${OE_USER}-server"
 # Set the website name
-WEBSITE_NAME="Jewori"
+WEBSITE_NAME="jewori"
 # Set the default Odoo longpolling port (you still have to use -c /etc/odoo-server.conf for example to use this.)
 LONGPOLLING_PORT="8072"
 # Set to "True" to install certbot and have ssl enabled, "False" to use http
@@ -263,7 +263,7 @@ server {
   listen 80;
 
   # set proper server name after domain set
-  server_name $WEBSITE_NAME;
+  server_name ${WEBSITE_NAME}.com;
 
   # Add Headers for odoo proxy mode
   proxy_set_header X-Forwarded-Host \$host;
@@ -350,7 +350,7 @@ fi
 if [ $INSTALL_NGINX = "True" ] && [ $ENABLE_SSL = "True" ] && [ $ADMIN_EMAIL != "odoo@example.com" ]  && [ $WEBSITE_NAME != "_" ];then
   sudo add-apt-repository ppa:certbot/certbot -y && sudo apt-get update -y
   sudo apt-get install python3-certbot-nginx -y
-  sudo certbot --nginx -d $WEBSITE_NAME --noninteractive --agree-tos --email $ADMIN_EMAIL --redirect
+  sudo certbot --nginx -d ${WEBSITE_NAME}.com --noninteractive --agree-tos --email $ADMIN_EMAIL --redirect
   sudo service nginx reload
   echo "SSL/HTTPS is enabled!"
 else
