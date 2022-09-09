@@ -26,7 +26,7 @@ OE_PORT="8069"
 # IMPORTANT! This script contains extra libraries that are specifically needed for Odoo 13.0
 OE_VERSION="15.0"
 # Set this to True if you want to install the Odoo enterprise version!
-IS_ENTERPRISE="False"
+IS_ENTERPRISE="True"
 # Set this to True if you want to install Nginx!
 INSTALL_NGINX="True"
 # Set the superadmin password - if GENERATE_RANDOM_PASSWORD is set to "True" we will automatically generate a random password, otherwise we use this one
@@ -117,7 +117,7 @@ if [ $IS_ENTERPRISE = "True" ]; then
     sudo su $OE_USER -c "mkdir $OE_HOME/enterprise"
     sudo su $OE_USER -c "mkdir $OE_HOME/enterprise/addons"
 
-    GITHUB_RESPONSE=$(sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/odoo/enterprise "$OE_HOME/enterprise/addons" 2>&1)
+    GITHUB_RESPONSE=$(sudo git clone --depth 1 --branch $OE_VERSION https://github.com/eversatis/enterprise "$OE_HOME/enterprise/addons" 2>&1)
     while [[ $GITHUB_RESPONSE == *"Authentication"* ]]; do
         echo "------------------------WARNING------------------------------"
         echo "Your authentication with Github has failed! Please try again."
@@ -125,7 +125,7 @@ if [ $IS_ENTERPRISE = "True" ]; then
         echo "TIP: Press ctrl+c to stop this script."
         echo "-------------------------------------------------------------"
         echo " "
-        GITHUB_RESPONSE=$(sudo git clone --depth 1 --branch $OE_VERSION https://www.github.com/odoo/enterprise "$OE_HOME/enterprise/addons" 2>&1)
+        GITHUB_RESPONSE=$(sudo git clone --depth 1 --branch $OE_VERSION https://github.com/eversatis/enterprise "$OE_HOME/enterprise/addons" 2>&1)
     done
 
     echo -e "\n---- Added Enterprise code under $OE_HOME/enterprise/addons ----"
@@ -163,7 +163,7 @@ sudo su root -c "printf 'logfile = /var/log/${OE_USER}/${OE_CONFIG}.log\n' >> /e
 if [ $IS_ENTERPRISE = "True" ]; then
     sudo su root -c "printf 'addons_path=${OE_HOME}/enterprise/addons,${OE_HOME_EXT}/addons\n' >> /etc/${OE_CONFIG}.conf"
 else
-    sudo su root -c "printf 'addons_path=${OE_HOME_EXT}/addons,${OE_HOME}/custom/enterprise,${OE_HOME}/custom/addons\n' >> /etc/${OE_CONFIG}.conf"
+    sudo su root -c "printf 'addons_path=${OE_HOME_EXT}/addons,${OE_HOME}/custom/addons\n' >> /etc/${OE_CONFIG}.conf"
 fi
 sudo chown $OE_USER:$OE_USER /etc/${OE_CONFIG}.conf
 sudo chmod 640 /etc/${OE_CONFIG}.conf
