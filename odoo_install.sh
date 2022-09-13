@@ -63,6 +63,15 @@ sudo apt-get update
 sudo apt-get upgrade -y
 
 #--------------------------------------------------
+# Install PostgreSQL Server
+#--------------------------------------------------
+echo -e "\n---- Install PostgreSQL Server ----"
+sudo apt-get install postgresql postgresql-server-dev-all -y
+
+echo -e "\n---- Creating the ODOO PostgreSQL User  ----"
+sudo su - postgres -c "createuser -s $OE_USER" 2> /dev/null || true
+
+#--------------------------------------------------
 # Install Dependencies
 #--------------------------------------------------
 echo -e "\n--- Installing Python 3 + pip3 --"
@@ -351,7 +360,7 @@ fi
 if [ $INSTALL_NGINX = "True" ] && [ $ENABLE_SSL = "True" ] && [ $ADMIN_EMAIL != "odoo@example.com" ]  && [ $WEBSITE_NAME != "_" ];then
   sudo add-apt-repository ppa:certbot/certbot -y && sudo apt-get update -y
   sudo apt-get install python3-certbot-nginx -y
-  sudo certbot --nginx -d $WEBSITE_NAME www.$WEBSITE_NAME --noninteractive --agree-tos --email $ADMIN_EMAIL --redirect
+  sudo certbot --nginx -d $WEBSITE_NAME --noninteractive --agree-tos --email $ADMIN_EMAIL --redirect
   sudo service nginx reload
   echo "SSL/HTTPS is enabled!"
 else
