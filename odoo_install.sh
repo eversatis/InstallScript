@@ -78,7 +78,7 @@ echo -e "\n--- Installing Python 3 + pip3 --"
 sudo apt-get install git python3 python3-pip build-essential wget python3-dev python3-venv python3-wheel libxslt-dev libzip-dev libldap2-dev libsasl2-dev python3-setuptools node-less libpng12-0 libjpeg-dev gdebi -y
 
 echo -e "\n---- Install python packages/requirements ----"
-sudo -H pip3 install -r https://raw.githubusercontent.com/odoo/odoo/4b01ba584fa229721455aaab351b804194cb426d/requirements.txt
+sudo -H pip3 install -r https://github.com/odoo/odoo/raw/${OE_VERSION}/requirements.txt
 
 echo -e "\n---- Installing nodeJS NPM and rtlcss for LTR support ----"
 sudo apt-get install nodejs npm -y
@@ -130,7 +130,7 @@ if [ $IS_ENTERPRISE = "True" ]; then
     while [[ $GITHUB_RESPONSE == *"Authentication"* ]]; do
         echo "------------------------WARNING------------------------------"
         echo "Your authentication with Github has failed! Please try again."
-        printf "In order to clone and install the Odoo enterprise version you \nneed to be an offical Odoo partner and you need access to\nhttp://github.com/odoo/enterprise.\n"
+        printf "In order to clone and install the Odoo enterprise version you \nneed access to\nhttp://github.com/eversatis/enterprise15.\n"
         echo "TIP: Press ctrl+c to stop this script."
         echo "-------------------------------------------------------------"
         echo " "
@@ -147,7 +147,17 @@ fi
 echo -e "\n---- Create custom module directory ----"
 sudo su $OE_USER -c "mkdir $OE_HOME/custom"
 sudo su $OE_USER -c "mkdir $OE_HOME/custom/addons"
-sudo git clone --depth 1 --branch main https://github.com/eversatis/addons15 "$OE_HOME/custom/addons" 2>&1
+
+GITHUB_RESPONSE=$(sudo git clone --depth 1 --branch main https://github.com/eversatis/addons15 "$OE_HOME/custom/addons" 2>&1)
+while [[ $GITHUB_RESPONSE == *"Authentication"* ]]; do
+    echo "------------------------WARNING------------------------------"
+    echo "Your authentication with Github has failed! Please try again."
+    printf "In order to clone and install the Odoo custom addons and you need access to\nhttp://github.com/eversatis/addons15.\n"
+    echo "TIP: Press ctrl+c to stop this script."
+    echo "-------------------------------------------------------------"
+    echo " "
+    GITHUB_RESPONSE=$(sudo git clone --depth 1 --branch main https://github.com/eversatis/addons15 "$OE_HOME/custom/addons" 2>&1)
+done
 
 echo -e "\n---- Setting permissions on home folder ----"
 sudo chown -R $OE_USER:$OE_USER $OE_HOME/*
@@ -360,7 +370,7 @@ fi
 if [ $INSTALL_NGINX = "True" ] && [ $ENABLE_SSL = "True" ] && [ $ADMIN_EMAIL != "odoo@example.com" ]  && [ $WEBSITE_NAME != "_" ];then
   sudo add-apt-repository ppa:certbot/certbot -y && sudo apt-get update -y
   sudo apt-get install python3-certbot-nginx -y
-  sudo certbot --nginx -d $WEBSITE_NAME --noninteractive --agree-tos --email $ADMIN_EMAIL --redirect
+  sudo certbot --nginx -d $WEBSITE_NAME www.$WEBSITE_NAME --noninteractive --agree-tos --email $ADMIN_EMAIL --redirect
   sudo service nginx reload
   echo "SSL/HTTPS is enabled!"
 else
@@ -375,6 +385,7 @@ echo "Port: $OE_PORT"
 echo "User service: $OE_USER"
 echo "Configuraton file location: /etc/${OE_CONFIG}.conf"
 echo "Logfile location: /var/log/$OE_USER"
+echo "User PostgreSQL: $OE_USER"
 echo "Code location: $OE_USER"
 echo "Addons folder: $OE_USER/$OE_CONFIG/addons/"
 echo "Password superadmin (database): $OE_SUPERADMIN"
